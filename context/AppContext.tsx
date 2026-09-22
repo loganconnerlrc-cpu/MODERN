@@ -11,6 +11,8 @@ export interface CalcResultData {
   isLater: boolean;
   decayFactor: number;
   unit: string;
+  unitAssumed: boolean;
+  intervalImplausible: boolean;
   actualAmount: number;
   calTime: string;
   injectionTime: string;

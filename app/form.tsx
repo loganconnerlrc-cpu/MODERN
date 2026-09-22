@@ -12,9 +12,36 @@ import {
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useApp } from '@/context/AppContext';
-import { calculateDecay, timeToMinutes, formatDose } from '@/utils/decay';
+import { calculateDecay, timeToMinutes, formatDose, MAX_ACTIVITY } from '@/utils/decay';
 import { ArrowLeft, Check, AlertCircle } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+interface ParsedActivity {
+  amount: number;
+  unit: string;
+  unitAssumed: boolean;
+}
+
+// Strict parse of the Cal Amount field. parseFloat alone silently accepts a
+// valid numeric PREFIX and discards the rest, so '12,5' becomes 12 and '0.5.3'
+// becomes 0.5 with no error. Anchoring the whole string means input that cannot
+// be read unambiguously is rejected instead of being quietly reinterpreted.
+export function parseActivity(input: string): ParsedActivity | null {
+  const match = input.trim().match(/^(\d+(?:\.\d+)?)\s*(mci|mbq)?$/i);
+  if (!match) return null;
+
+  const amount = Number(match[1]);
+  if (!Number.isFinite(amount) || amount <= 0 || amount > MAX_ACTIVITY) {
+    return null;
+  }
+
+  const detected = match[2];
+  return {
+    amount,
+    unit: detected && detected.toLowerCase() === 'mbq' ? 'MBq' : 'mCi',
+    unitAssumed: !detected,
+  };
+}
 
 export default function FormScreen() {
   const { scanData, setCalcResult } = useApp();
@@ -35,9 +62,9 @@ export default function FormScreen() {
   const validateAndSubmit = () => {
     const newErrors: Record<string, string> = {};
 
-    const amount = parseFloat(actualAmount);
-    if (!actualAmount || isNaN(amount) || amount <= 0) {
-      newErrors.amount = 'Enter a valid activity amount';
+    const parsed = parseActivity(actualAmount);
+    if (!parsed) {
+      newErrors.amount = `Enter a number, optionally with mCi or MBq (max ${MAX_ACTIVITY})`;
     }
 
     const calMin = timeToMinutes(calTime);
@@ -54,25 +81,20 @@ export default function FormScreen() {
     if (Object.keys(newErrors).length > 0) return;
 
     const result = calculateDecay({
-      actualAmount: amount,
+      actualAmount: parsed!.amount,
       calMinutes: calMin!,
       injectionMinutes: injMin!,
     });
-
-    let unit = 'mCi';
-    const amountStr = actualAmount.trim();
-    const unitMatch = amountStr.match(/(mci|mbq)/i);
-    if (unitMatch) {
-      unit = unitMatch[1].toLowerCase() === 'mbq' ? 'MBq' : 'mCi';
-    }
 
     setCalcResult({
       dose: result.dose,
       minutesDifference: result.minutesDifference,
       isLater: result.isLater,
       decayFactor: result.decayFactor,
-      unit,
-      actualAmount: amount,
+      unit: parsed!.unit,
+      unitAssumed: parsed!.unitAssumed,
+      intervalImplausible: result.intervalImplausible,
+      actualAmount: parsed!.amount,
       calTime,
       injectionTime,
     });
@@ -81,15 +103,10 @@ export default function FormScreen() {
   };
 
   const isFormValid = () => {
-    const amount = parseFloat(actualAmount);
-    const calMin = timeToMinutes(calTime);
-    const injMin = timeToMinutes(injectionTime);
     return (
-      actualAmount &&
-      !isNaN(amount) &&
-      amount > 0 &&
-      calMin !== null &&
-      injMin !== null
+      parseActivity(actualAmount) !== null &&
+      timeToMinutes(calTime) !== null &&
+      timeToMinutes(injectionTime) !== null
     );
   };
 

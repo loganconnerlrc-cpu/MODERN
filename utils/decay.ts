@@ -1,5 +1,16 @@
 export const TC99M_HALF_LIFE_MINUTES = 360.4;
 
+// Times are entered as wall-clock HH:MM with no date, so an interval that
+// actually crosses midnight (e.g. cal 23:00, injection 01:00) is indistinguishable
+// from a same-day interval of nearly 24 hours. Anything beyond this many minutes
+// is implausible for a ~6 hour half-life tracer and is flagged rather than
+// presented as a reliable figure.
+export const IMPLAUSIBLE_INTERVAL_MINUTES = 720;
+
+// Upper bound on an entered activity. Far above any real clinical dose, but
+// finite, so a runaway or mistyped value cannot reach the calculation.
+export const MAX_ACTIVITY = 100000;
+
 export interface CalcInput {
   actualAmount: number;
   calMinutes: number;
@@ -11,6 +22,7 @@ export interface CalcResult {
   minutesDifference: number;
   isLater: boolean;
   decayFactor: number;
+  intervalImplausible: boolean;
 }
 
 export function timeToMinutes(timeStr: string): number | null {
@@ -46,7 +58,13 @@ export function calculateDecay(input: CalcInput): CalcResult {
     dose = input.actualAmount / decayFactor;
   }
 
-  return { dose, minutesDifference, isLater, decayFactor };
+  return {
+    dose,
+    minutesDifference,
+    isLater,
+    decayFactor,
+    intervalImplausible: minutesDifference > IMPLAUSIBLE_INTERVAL_MINUTES,
+  };
 }
 
 export function formatDose(dose: number): string {

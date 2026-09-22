@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useApp } from '@/context/AppContext';
 import { formatDose } from '@/utils/decay';
-import { RotateCcw, Activity, ArrowLeft } from 'lucide-react-native';
+import { RotateCcw, Activity, ArrowLeft, AlertTriangle } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Polygon } from 'react-native-svg';
 
@@ -148,7 +148,7 @@ export default function ResultScreen() {
     );
   }
 
-  const { dose, minutesDifference, decayFactor, unit, actualAmount, calTime, injectionTime } = calcResult;
+  const { dose, minutesDifference, decayFactor, unit, unitAssumed, intervalImplausible, actualAmount, calTime, injectionTime } = calcResult;
   const doseColor = getDoseColor(dose, actualAmount);
   const pctDeviation = ((dose - actualAmount) / actualAmount) * 100;
   const pctSign = pctDeviation >= 0 ? '+' : '';
@@ -175,6 +175,22 @@ export default function ResultScreen() {
           {formatDose(dose)}{' '}
           <Text style={[styles.doseUnit, { color: doseColor }]}>{unit}</Text>
         </Text>
+
+        {unitAssumed && (
+          <Text style={styles.assumedNote}>
+            Unit not detected — {unit} assumed. Confirm against the sticker.
+          </Text>
+        )}
+
+        {intervalImplausible && (
+          <View style={styles.warningBox}>
+            <AlertTriangle color="#F59E0B" size={16} />
+            <Text style={styles.warningText}>
+              Cal and injection times are {minutesDifference} minutes apart. If these
+              times cross midnight, re-enter them — this result would be wrong.
+            </Text>
+          </View>
+        )}
 
         <DeviationBar deviation={pctDeviation} />
 
@@ -273,6 +289,34 @@ const styles = StyleSheet.create({
   doseUnit: {
     fontSize: 28,
     fontWeight: '600',
+  },
+  assumedNote: {
+    fontSize: 12,
+    color: '#94A3B8',
+    textAlign: 'center',
+    marginTop: -12,
+    marginBottom: 16,
+    maxWidth: 320,
+  },
+  warningBox: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+    width: '100%',
+    maxWidth: 360,
+    marginBottom: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderRadius: 12,
+    backgroundColor: 'rgba(245, 158, 11, 0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(245, 158, 11, 0.4)',
+  },
+  warningText: {
+    flex: 1,
+    color: '#FCD34D',
+    fontSize: 12,
+    lineHeight: 17,
   },
   detailsContainer: {
     width: '100%',

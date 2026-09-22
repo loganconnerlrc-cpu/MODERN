@@ -1,4 +1,6 @@
-# Simple workflow for deploying static content to GitHub Pages
+# Build the Expo web app and deploy ONLY the build output to GitHub Pages.
+# Never upload the repository root: that would publish source files and any
+# local config (such as .env) as fetchable URLs on the public site.
 name: Deploy static content to Pages
 
 on:
@@ -22,7 +24,6 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Single deploy job since we're just deploying
   deploy:
     environment:
       name: github-pages
@@ -31,13 +32,22 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Build web app
+        run: npm run build:web
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
-          path: '.'
+          # Publish the compiled web bundle only, never the repository root.
+          path: './dist'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
