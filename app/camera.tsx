@@ -178,17 +178,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   refImageWrapper: {
-    flex: 1,
-    maxWidth: 160,
-    aspectRatio: 4 / 3,
+    width: 150,
+    height: 112,
     borderRadius: 8,
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: 'rgba(96, 165, 250, 0.4)',
   },
   refImage: {
-    width: '100%',
-    height: '100%',
+    width: 150,
+    height: 112,
   },
   guideText: { color: '#FFFFFF', fontSize: 15, textAlign: 'center', fontWeight: '500' },
   captureButton: {
