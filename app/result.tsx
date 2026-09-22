@@ -180,6 +180,15 @@ export default function ResultScreen() {
 
         <View style={styles.detailsContainer}>
           <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>Percent Deviation</Text>
+            <Text style={[styles.detailValue, { color: doseColor }]}>
+              {pctDeviationText}
+            </Text>
+          </View>
+
+          <View style={styles.divider} />
+
+          <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Cal Amount</Text>
             <Text style={styles.detailValue}>
               {actualAmount} {unit}
@@ -218,14 +227,7 @@ export default function ResultScreen() {
             </Text>
           </View>
 
-          <View style={styles.divider} />
 
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Percent Deviation</Text>
-            <Text style={[styles.detailValue, { color: doseColor }]}>
-              {pctDeviationText}
-            </Text>
-          </View>
         </View>
       </View>
 
