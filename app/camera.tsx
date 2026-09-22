@@ -99,7 +99,7 @@ export default function CameraScreen() {
         <View style={styles.bottomShade} />
 
         <View style={[styles.controls, { paddingBottom: insets.bottom + 24 }]}>
-          {!isScanning && <Text style={styles.guideText}>Align dose sticker within the frame.</Text>}
+          {!isScanning && <Text style={styles.guideText}>Align cal time and actual amount within the frame.</Text>}
           <Pressable style={styles.captureButton} onPress={takePicture} disabled={isScanning}>
             <Image
               source={require('@/assets/images/logo2.png')}
