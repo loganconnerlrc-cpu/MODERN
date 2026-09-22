@@ -36,6 +36,9 @@ export default function ResultScreen() {
 
   const { dose, minutesDifference, decayFactor, unit, actualAmount, calTime, injectionTime } = calcResult;
   const doseColor = getDoseColor(dose, actualAmount);
+  const pctDeviation = ((dose - actualAmount) / actualAmount) * 100;
+  const pctSign = pctDeviation >= 0 ? '+' : '';
+  const pctDeviationText = `${pctSign}${pctDeviation.toFixed(1)}%`;
 
   const handleStartOver = () => {
     reset();
@@ -102,9 +105,9 @@ export default function ResultScreen() {
           <View style={styles.divider} />
 
           <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Radiopharmaceutical Used</Text>
-            <Text style={styles.detailValue}>
-              Tc-99m tetrofosmin (Myoview)
+            <Text style={styles.detailLabel}>Percent Deviation</Text>
+            <Text style={[styles.detailValue, { color: doseColor }]}>
+              {pctDeviationText}
             </Text>
           </View>
         </View>
