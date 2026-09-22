@@ -12,22 +12,22 @@ export default function StartPage() {
       colors={['#0A1628', '#0F2944', '#0A1628']}
       style={styles.container}
     >
-      <View style={[styles.content, { paddingTop: insets.top + 40 }]}>
-        <View style={styles.logoContainer}>
-          <Image
-            source={require('@/assets/images/logo2.png')}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-        </View>
+      <View style={[styles.content, { paddingTop: insets.top }]}>
+        <View style={styles.heroSection}>
+          <View style={styles.logoContainer}>
+            <Image
+              source={require('@/assets/images/logo2.png')}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+          </View>
 
-        <View style={styles.titleContainer}>
-          <Atom color="#3B82F6" size={32} strokeWidth={2} />
-          <Text style={styles.title}>MODERN NUCLEAR</Text>
-          <Text style={styles.subtitle}>Tc-99m Activity Calculator</Text>
+          <View style={styles.titleContainer}>
+            <Atom color="#3B82F6" size={32} strokeWidth={2} />
+            <Text style={styles.title}>MODERN NUCLEAR</Text>
+            <Text style={styles.subtitle}>Tc-99m Activity Calculator</Text>
+          </View>
         </View>
-
-        <View style={styles.spacer} />
 
         <View style={styles.buttonContainer}>
           <Pressable
@@ -62,6 +62,12 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     paddingHorizontal: 24,
+    justifyContent: 'space-between',
+  },
+  heroSection: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   logoContainer: {
     width: 180,
@@ -92,9 +98,7 @@ const styles = StyleSheet.create({
     color: '#3B82F6',
     letterSpacing: 1,
   },
-  spacer: {
-    flex: 1,
-  },
+
   buttonContainer: {
     width: '100%',
     alignItems: 'center',
