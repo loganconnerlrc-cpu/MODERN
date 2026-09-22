@@ -17,7 +17,7 @@ export default function CameraScreen() {
   const { setScanData } = useApp();
   const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
-  const frameWidth = Math.min(width - 70, 380);
+  const frameWidth = Math.min(width - 38, 380);
   const frameHeight = height * 0.3;
 
   useFocusEffect(
