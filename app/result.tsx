@@ -5,13 +5,127 @@ import { useApp } from '@/context/AppContext';
 import { formatDose } from '@/utils/decay';
 import { RotateCcw, Activity, ArrowLeft } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Svg, { Polygon } from 'react-native-svg';
+
+const BAR_MAX = 15;
+const BAR_HEIGHT = 20;
 
 function getDoseColor(dose: number, actualAmount: number): string {
   const pctDiff = Math.abs((dose - actualAmount) / actualAmount) * 100;
   if (pctDiff > 10) return '#EF4444';
-  if (pctDiff > 6) return '#F59E0B';
+  if (pctDiff > 7) return '#F59E0B';
   return '#10B981';
 }
+
+function pctToPosition(pct: number): string {
+  const clamped = Math.max(-BAR_MAX, Math.min(BAR_MAX, pct));
+  const ratio = (clamped + BAR_MAX) / (2 * BAR_MAX);
+  return `${ratio * 100}%`;
+}
+
+function markerPosition(pct: number): string {
+  const ratio = (pct + BAR_MAX) / (2 * BAR_MAX);
+  return `${ratio * 100}%`;
+}
+
+function DeviationBar({ deviation }: { deviation: number }) {
+  const arrowPos = pctToPosition(deviation);
+
+  return (
+    <View style={barStyles.wrapper}>
+      <View style={barStyles.arrowRow}>
+        <View style={[barStyles.arrowContainer, { left: arrowPos }]}>
+          <Svg width={16} height={10} viewBox="0 0 16 10">
+            <Polygon points="8,10 0,0 16,0" fill="#FFFFFF" />
+          </Svg>
+        </View>
+      </View>
+
+      <View style={barStyles.barOuter}>
+        <LinearGradient
+          colors={[
+            '#EF4444',
+            '#F59E0B',
+            '#10B981',
+            '#10B981',
+            '#F59E0B',
+            '#EF4444',
+          ]}
+          locations={[0, 0.27, 0.4, 0.6, 0.73, 1]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={barStyles.gradient}
+        />
+
+        <View style={[barStyles.marker, { left: markerPosition(-10) }]} />
+        <View style={[barStyles.marker, { left: markerPosition(0) }]} />
+        <View style={[barStyles.marker, { left: markerPosition(10) }]} />
+      </View>
+
+      <View style={barStyles.labelsRow}>
+        <Text style={[barStyles.labelText, { left: markerPosition(-10) }]}>
+          -10%
+        </Text>
+        <Text style={[barStyles.labelText, { left: markerPosition(0) }]}>
+          0%
+        </Text>
+        <Text style={[barStyles.labelText, { left: markerPosition(10) }]}>
+          +10%
+        </Text>
+      </View>
+    </View>
+  );
+}
+
+const barStyles = StyleSheet.create({
+  wrapper: {
+    width: '100%',
+    maxWidth: 360,
+    marginBottom: 24,
+  },
+  arrowRow: {
+    height: 14,
+    position: 'relative',
+    marginBottom: 2,
+  },
+  arrowContainer: {
+    position: 'absolute',
+    marginLeft: -8,
+    bottom: 0,
+  },
+  barOuter: {
+    height: BAR_HEIGHT,
+    borderRadius: BAR_HEIGHT / 2,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  gradient: {
+    flex: 1,
+  },
+  marker: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    width: 2,
+    marginLeft: -1,
+    backgroundColor: '#000000',
+    opacity: 0.6,
+  },
+  labelsRow: {
+    height: 18,
+    position: 'relative',
+    marginTop: 4,
+  },
+  labelText: {
+    position: 'absolute',
+    fontSize: 10,
+    color: '#64748B',
+    fontWeight: '500',
+    textAlign: 'center',
+    width: 40,
+    marginLeft: -20,
+  },
+});
 
 export default function ResultScreen() {
   const { calcResult, reset } = useApp();
@@ -61,6 +175,8 @@ export default function ResultScreen() {
           {formatDose(dose)}{' '}
           <Text style={[styles.doseUnit, { color: doseColor }]}>{unit}</Text>
         </Text>
+
+        <DeviationBar deviation={pctDeviation} />
 
         <View style={styles.detailsContainer}>
           <View style={styles.detailRow}>
@@ -149,7 +265,7 @@ const styles = StyleSheet.create({
   doseValue: {
     fontSize: 56,
     fontWeight: '800',
-    marginBottom: 40,
+    marginBottom: 20,
     textAlign: 'center',
   },
   doseUnit: {
