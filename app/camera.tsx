@@ -99,6 +99,22 @@ export default function CameraScreen() {
         <View style={styles.bottomShade} />
 
         <View style={[styles.controls, { paddingBottom: insets.bottom + 24 }]}>
+          <View style={styles.referenceRow}>
+            <View style={styles.refImageWrapper}>
+              <Image
+                source={require('@/assets/images/Left_side.jpeg')}
+                style={styles.refImage}
+                resizeMode="cover"
+              />
+            </View>
+            <View style={styles.refImageWrapper}>
+              <Image
+                source={require('@/assets/images/Right_side.jpeg')}
+                style={styles.refImage}
+                resizeMode="cover"
+              />
+            </View>
+          </View>
           {!isScanning && <Text style={styles.guideText}>Align cal time and actual amount within the frame.</Text>}
           <Pressable style={styles.captureButton} onPress={takePicture} disabled={isScanning}>
             <Image
@@ -154,6 +170,25 @@ const styles = StyleSheet.create({
     gap: 16,
     paddingTop: 14,
     backgroundColor: NAVY,
+  },
+  referenceRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 10,
+    paddingHorizontal: 24,
+  },
+  refImageWrapper: {
+    flex: 1,
+    maxWidth: 160,
+    aspectRatio: 4 / 3,
+    borderRadius: 8,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(96, 165, 250, 0.4)',
+  },
+  refImage: {
+    width: '100%',
+    height: '100%',
   },
   guideText: { color: '#FFFFFF', fontSize: 15, textAlign: 'center', fontWeight: '500' },
   captureButton: {
